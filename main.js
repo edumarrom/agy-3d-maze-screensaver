@@ -1,3 +1,4 @@
+/* repo */
 import { Maze } from './maze.js';
 import { MazeRenderer } from './renderer.js';
 import * as THREE from 'three';
@@ -54,6 +55,8 @@ class App {
     this.introDuration = 2.0;
     this.wonDuration = 0.5; // Reduced to 0.5s for faster reset
 
+    this.wakeLock = null; // Sentinel for Wake Lock
+
     this.init();
   }
 
@@ -77,6 +80,10 @@ class App {
 
       this.startNewGame();
       this.setupFullscreenListeners();
+
+      // Handle visibility change to re-acquire lock
+      document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
+
       this.renderer.renderer.setAnimationLoop(() => this.update());
     } catch (error) {
       console.error("Init failed:", error);
@@ -108,6 +115,7 @@ class App {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(() => {
         this.lockOrientation();
+        this.requestWakeLock(); // Request Wake Lock on user interaction
       }).catch(err => {
         console.warn(`Error attempting to enable fullscreen: ${err.message}`);
       });
@@ -132,6 +140,28 @@ class App {
   unlockOrientation() {
     if (screen.orientation && screen.orientation.unlock) {
       screen.orientation.unlock();
+    }
+  }
+
+  async requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator) {
+        this.wakeLock = await navigator.wakeLock.request('screen');
+        console.log('Wake Lock is active');
+
+        this.wakeLock.addEventListener('release', () => {
+          console.log('Wake Lock released');
+          this.wakeLock = null;
+        });
+      }
+    } catch (err) {
+      console.error(`${err.name}, ${err.message}`);
+    }
+  }
+
+  async handleVisibilityChange() {
+    if (this.wakeLock !== null && document.visibilityState === 'visible') {
+      await this.requestWakeLock();
     }
   }
 
