@@ -53,15 +53,40 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+
+    /* Mantiene tu idea de no interceptar clics del rat¨®n */
     pointer-events: none;
+
     opacity: 0;
     transition: opacity 0.5s ease-out;
     z-index: 1000;
+
+    /* RESET de bot¨®n nativo (quita borde/appearance) */
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    box-shadow: none;
+    appearance: none;
+    -webkit-appearance: none;
+    line-height: 0;
 }
 
+/* Foco visible SOLO con teclado (accesible y bonito) */
+#audio-icon:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.35);
+    border-radius: 999px;
+}
+
+/* SVG igual que ten¨ªas */
 #audio-icon svg {
     width: 100px;
     height: 100px;
     fill: white;
     filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+    display: block;
+    border: 0;
+    outline: 0;
 }
