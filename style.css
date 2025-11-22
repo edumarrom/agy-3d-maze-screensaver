@@ -1,0 +1,67 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #ddd;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Permitimos scroll vertical para que pueda existir contenido debajo */
+body {
+    overflow-y: auto;
+}
+
+/* El laberinto sigue ocupando toda la primera pantalla */
+#app {
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Sección de descripción SEO */
+#about-project {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 3.5rem;
+    line-height: 1.7;
+    font-size: 0.95rem;
+    color: #e0e0e0;
+}
+
+/* No competir visualmente con el laberinto */
+#about-project h1,
+#about-project h2 {
+    font-size: 1.3rem;
+    margin: 0 0 0.75rem;
+    color: #ffffff;
+}
+
+#about-project p {
+    margin: 0 0 0.9rem;
+}
+
+#about-project a {
+    color: #9ad0ff;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    font-size: 0.9rem;
+}
+
+#audio-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+    z-index: 1000;
+}
+
+#audio-icon svg {
+    width: 100px;
+    height: 100px;
+    fill: white;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+}

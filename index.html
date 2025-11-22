@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Maze Screensaver – Recreación en WebGL con antigravity</title>
+  <link rel="icon" type="image/png" href="./assets/favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+
+      {
+        "@type": "WebApplication",
+        "@id": "https://3dmaze.dabaliu.com/#app",
+        "name": "3D Maze Screensaver",
+        "url": "https://3dmaze.dabaliu.com/",
+        "description": "Recreation of the classic Windows 3D Maze screensaver, built with Google Antigravity using WebGL and Three.js.",
+        "applicationCategory": "Game",
+        "operatingSystem": "Any",
+        "author": {
+          "@id": "https://3dmaze.dabaliu.com/#author"
+        },
+        "image": {
+          "@id": "https://3dmaze.dabaliu.com/#screenshot"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      },
+
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": "https://3dmaze.dabaliu.com/#source",
+        "name": "3D Maze Screensaver Source Code",
+        "codeRepository": "https://github.com/edumarrom/agy-3d-maze-screensaver",
+        "programmingLanguage": "JavaScript",
+        "runtimePlatform": "WebGL / Three.js",
+        "description": "Source code of the 3D maze demo, including maze generation, autonomous navigation, WebGL rendering and looping vintage computer sound.",
+        "author": {
+          "@id": "https://3dmaze.dabaliu.com/#author"
+        }
+      },
+
+      {
+        "@type": "Person",
+        "@id": "https://3dmaze.dabaliu.com/#author",
+        "name": "Eduardo Martínez Romero",
+        "jobTitle": "Web Developer",
+        "url": "https://3dmaze.dabaliu.com/"
+      },
+
+      {
+        "@type": "ImageObject",
+        "@id": "https://3dmaze.dabaliu.com/#screenshot",
+        "url": "https://3dmaze.dabaliu.com/assets/3d-maze-screensaver.webp",
+        "contentUrl": "https://3dmaze.dabaliu.com/assets/3d-maze-screensaver.webp",
+        "caption": "Interactive 3D recreation of the classic Windows 3D Maze screensaver running in the browser."
+      }
+
+    ]
+  }
+  </script>
+
+</head>
+
+<body>
+  <div id="app"></div>
+  <div id="audio-icon"></div>
+
+  <section id="about-project">
+    <h1>About this 3D Maze</h1>
+    <p>
+      This page is an interactive recreation of the classic
+      <strong>Windows 3D Maze screensaver</strong>, running directly in the browser
+      using <strong>WebGL</strong> and <strong>Three.js</strong>.
+    </p>
+    <p>
+      The project was developed entirely inside <a href="https://antigravity.google/"><strong>Google
+          Antigravity</strong></a>,
+      using AI-assisted code generation to build the maze logic, the automatic
+      solving algorithm, the textures, and the decorative elements.
+      Its main purpose is not to be a full game but to serve as a
+      <strong>technical demo</strong> or an “advanced Hello World” that showcases
+      what can be achieved by combining modern web development with AI tools.
+    </p>
+    <p>
+      The engine generates random mazes on each run, places start and end points,
+      themed textures, and various elements inside the scene. The camera follows
+      the path of the “bot” that solves the maze using the traditional
+      right-hand / left-hand rule, and includes small camera turns and animations
+      to enhance the feeling of being inside the original screensaver.
+    </p>
+    <p>
+      Beyond nostalgia, this demo aims to provide a practical example of:
+      development with <strong>Three.js</strong>, using <strong>WebGL</strong> for
+      screensaver-style applications, looped audio integration, and exploring
+      workflows where large portions of the code are generated and refined using
+      language models.
+    </p>
+
+    <p>
+      There is also an experimental mode internally called “agy” that makes subtle visual changes.
+    </p>
+
+    <h2>User Interaction</h2>
+    <p>
+      The demo includes a minimal interaction layer designed to remain invisible during normal viewing:
+    </p>
+    <ul>
+      <li><strong>Single tap / click:</strong> toggles a looped vintage PC ambient sound (hard-drive seek noise prepared
+        for seamless looping).</li>
+      <li><strong>Double tap / double click:</strong> enables or exits fullscreen mode.</li>
+    </ul>
+    <p>
+      These subtle controls keep the experience close to the original Windows 3D Maze screensaver while offering
+      optional ambience and fullscreen immersion.
+    </p>
+
+    <h2 id="author">About Me</h2>
+    <p>
+      I’ve been interested in computers since childhood, drawn to understanding how they worked and how to fix what I
+      broke.
+      That curiosity eventually led me into web development, and more recently into exploring AI-assisted creation with
+      tools like Google Antigravity. Outside of programming, I spend my time with philosophy, gardening, and Japanese
+      jazz-funk.
+    </p>
+  </section>
+
+  <script type="module" src="./main.js"></script>
+</body>
+<script>
+  let audioCtx;
+  let loopBuffer;
+  let source;
+  let gainNode;
+  let isPlaying = false;
+  let iconTimeout;
+
+  const iconContainer = document.getElementById('audio-icon');
+
+  const speakerOnPath = "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z";
+  const speakerOffPath = "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z";
+
+  async function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      try {
+        const response = await fetch("./assets/audio.ogg");
+        const arrayBuffer = await response.arrayBuffer();
+        loopBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      } catch (e) {
+        console.error("Error loading audio:", e);
+        return;
+      }
+    }
+
+    if (audioCtx.state === "suspended") {
+      await audioCtx.resume();
+    }
+  }
+
+  function startSound() {
+    if (!loopBuffer) return;
+
+    source = audioCtx.createBufferSource();
+    gainNode = audioCtx.createGain();
+
+    source.buffer = loopBuffer;
+    source.loop = true;
+    gainNode.gain.value = 0.25;
+
+    source.connect(gainNode).connect(audioCtx.destination);
+    source.start(0);
+    isPlaying = true;
+  }
+
+  function stopSound() {
+    if (source) {
+      source.stop();
+      source.disconnect();
+      source = null;
+    }
+    isPlaying = false;
+  }
+
+  function showIcon(isMuted) {
+    const path = isMuted ? speakerOffPath : speakerOnPath;
+    iconContainer.innerHTML = `<svg viewBox="0 0 24 24"><path d="${path}"/></svg>`;
+
+    iconContainer.style.opacity = '1';
+
+    if (iconTimeout) clearTimeout(iconTimeout);
+    iconTimeout = setTimeout(() => {
+      iconContainer.style.opacity = '0';
+    }, 1000);
+  }
+
+  document.addEventListener("click", async () => {
+    await initAudio();
+
+    if (isPlaying) {
+      stopSound();
+      showIcon(true);
+    } else {
+      startSound();
+      showIcon(false);
+    }
+  });
+</script>
+
+
+</html>
