@@ -6,7 +6,7 @@ This project is a 3D maze screensaver built as a technical demo to test the capa
 
 This application is a modern reinterpretation of the classic Windows 95 3D Maze screensaver. It features:
 *   Procedurally generated mazes.
-*   Autonomous bot navigation with "Right-Hand Rule" logic.
+*   Autonomous bot navigation using the right-hand rule, switching to the left-hand rule whenever a stone flips the camera.
 *   Dynamic camera movements and inversions.
 *   Interactive elements like stones that trigger gravity flips.
 *   A "rat" entity that wanders the maze.
