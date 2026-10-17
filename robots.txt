@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://3dmaze.dabaliu.com/sitemap.xml
+Sitemap: https://edumarrom.github.io/agy-3d-maze-screensaver/sitemap.xml
